@@ -1,11 +1,38 @@
 require 'sinatra'   # gem 'sinatra'
 require 'line/bot'  # gem 'line-bot-api'
+require 'net/http'
+
+SECRET_KEY = ENV["API_SECRET"]
 
 def client
   @client ||= Line::Bot::Client.new { |config|
     config.channel_secret = ENV["LINE_CHANNEL_SECRET"]
     config.channel_token = ENV["LINE_CHANNEL_TOKEN"]
   }
+end
+
+def dr_api(line_user_id)
+  tt = Time.now.to_i
+  url_str = "https://staging.saibugas.dr-electricity.com/api/v1/line_messages/participations"
+  uri = URI.parse(url_str)
+  uri.query = URI.encode_www_form({ tt: })
+  headers = {
+    'Content-Type': 'application/json',
+    'X-Dr-Authorization': Digest::SHA256.hexdigest("#{url_str}?tt=#{tt}:#{SECRET_KEY}")
+  }
+  p headers['X-Dr-Authorization']
+  http = Net::HTTP.new(uri.host, uri.port)
+  http.use_ssl = uri.scheme === "https"
+  params = {
+    mypage_id: '1234567890',
+    supply_point_number: '900000012345600000000',
+    customer_number: '123456',
+    line_user_id:
+  }
+  response = http.post(uri.request_uri, params.to_json, headers)
+  puts response.code
+  puts response.message
+  puts response.read_body
 end
 
 get '/' do
@@ -27,11 +54,16 @@ post '/callback' do
     when Line::Bot::Event::Message
       case event.type
       when Line::Bot::Event::MessageType::Text
-        message = {
-          type: 'text',
-          text: event.message['text']
-        }
-        client.reply_message(event['replyToken'], message)
+        if event.message['text'] == 'みんなで節電キャンペーン'
+          puts "userId:#{event.source['userId']}"
+          dr_api(event.source['userId'])
+        else
+          message = {
+            type: 'text',
+            text: event.message['text']
+          }
+          client.reply_message(event['replyToken'], message)
+        end
       end
     end
   end
