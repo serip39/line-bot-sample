@@ -55,8 +55,9 @@ post '/callback' do
       case event.type
       when Line::Bot::Event::MessageType::Text
         if event.message['text'] == 'みんなで節電キャンペーン'
-          puts "userId:#{event.source['userId']}"
-          dr_api(event.source['userId'])
+          user_id = event['source']['userId']
+          puts "userId:#{user_id}"
+          dr_api(user_id)
         else
           message = {
             type: 'text',
