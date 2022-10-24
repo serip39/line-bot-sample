@@ -34,10 +34,14 @@ class Pumatra < Sinatra::Base
       customer_number: '123456',
       line_user_id:
     }
-    response = http.post(uri.request_uri, params.to_json, headers)
-    puts response.code
-    puts response.message
-    puts response.read_body
+    begin
+      response = http.post(uri.request_uri, params.to_json, headers)
+      puts response.code
+      puts response.message
+      puts response.read_body
+    rescue StandardError => e
+      puts e.message
+    end
   end
 
   get '/' do
