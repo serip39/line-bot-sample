@@ -20,7 +20,6 @@ def dr_api(line_user_id)
     'Content-Type': 'application/json',
     'X-Dr-Authorization': Digest::SHA256.hexdigest("#{url_str}?tt=#{tt}:#{SECRET_KEY}")
   }
-  p headers['X-Dr-Authorization']
   http = Net::HTTP.new(uri.host, uri.port)
   http.use_ssl = uri.scheme === "https"
   params = {
