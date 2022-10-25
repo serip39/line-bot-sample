@@ -24,7 +24,8 @@ class Pumatra < Sinatra::Base
     uri.query = URI.encode_www_form({ tt: })
     headers = {
       'Content-Type': 'application/json',
-      'X-Dr-Authorization': Digest::SHA256.hexdigest("#{url_str}?tt=#{tt}:#{SECRET_KEY}")
+      'X-Dr-Authorization': Digest::SHA256.hexdigest("#{url_str}?tt=#{tt}:#{SECRET_KEY}"),
+      'origin': 'https://line-bot.dr-electricity.com'
     }
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = uri.scheme === "https"
