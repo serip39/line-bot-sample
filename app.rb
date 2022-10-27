@@ -30,7 +30,7 @@ class Pumatra < Sinatra::Base
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = uri.scheme === "https"
     params = {
-      mypage_id: '1234567890',
+      mypage_id: tt,
       supply_point_number: '900000012345600000000',
       customer_number: '123456',
       line_user_id:
